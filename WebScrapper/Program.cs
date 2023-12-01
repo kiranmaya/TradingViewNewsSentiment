@@ -17,7 +17,7 @@ Console.WriteLine("Started");
 
 //await RestTest.CallFlaskApiAsync("This is good ");
 
-//await WebSearch.Search("HEROMOTOCO");
+await WebSearch.Search("HEROMOTOCO");
 
 await Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>

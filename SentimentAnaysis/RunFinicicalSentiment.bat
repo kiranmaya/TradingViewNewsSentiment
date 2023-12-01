@@ -1,3 +1,3 @@
-d:\StableDiffusionWeb\system\python\python.exe SentimentFinancial.py
+d:\StableDiffusionWeb\system\python\python.exe SentimentFinancial2.py
 
 

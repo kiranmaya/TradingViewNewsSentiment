@@ -73,28 +73,45 @@ namespace WebScrapper
             Console.WriteLine("articleElements   " + articleElements.Count);
 
             // Iterate through each article and extract title and date
-            Dictionary<DateTime, string> news = new Dictionary<DateTime, string>();
+        
 
-            AllNews all = new AllNews();
-            all.lasttime = DateTime.Now;
-            all.Symbol = query;
+           List<News> AllNews = new List<News>();
 
             foreach( var article in articleElements.Take(5) ) // Assuming you want to process the first 5 articles
             {
                 try
                 {
+
+
+                    IWebElement element = article.FindElement(By.CssSelector("span[class*='block-'] span"));
+
+
+                    string reutersValue = element.Text;
+                    // Output the value
+                    Console.WriteLine($"Provider Value: {reutersValue}");
+
                     var title = article.FindElement(By.CssSelector("[class^='title-']")).Text;
+                    title =  title;
                     var dateElement = article.FindElement(By.CssSelector(".date-TUPxzdRV relative-time"));
                     var ssrTime = dateElement.GetAttribute("event-time");
                     string dateString = ssrTime;
-                    DateTime dateTime = DateTime.ParseExact(dateString, "ddd, dd MMM yyyy HH:mm:ss 'GMT'", System.Globalization.CultureInfo.InvariantCulture);
+                    DateTime newsTims = DateTime.ParseExact(dateString, "ddd, dd MMM yyyy HH:mm:ss 'GMT'", System.Globalization.CultureInfo.InvariantCulture);
 
-                    if( dateTime.AddDays(10) > DateTime.Now )
+                    if( newsTims.AddDays(10) > DateTime.Now )
                     {
+                        News news1 = new News();
+                        news1.lasttime = DateTime.Now;
+                        news1.provider = reutersValue;
+                        news1.news = title;
+                        news1.Symbol = query;
+                        news1.newsTime= newsTims;
+                        AllNews.Add(news1);
                         Console.WriteLine($"Title: {title}");
-                        Console.WriteLine(dateTime.ToString("dd-MM-yyy HH:mm:ss")); // Display in a specific format
+                        Console.WriteLine(newsTims.ToString("dd-MM-yyy HH:mm:ss")); // Display in a specific format
                         Console.WriteLine();
-                        news.Add(dateTime.ToLocalTime(), title);
+
+
+                 
                     }
                 }
                 catch( Exception e )
@@ -107,21 +124,24 @@ namespace WebScrapper
             }
 
             Console.WriteLine("Done ");
-            all.cacheval = news;
+     
 
             // Cache the result
-            cache.AddOrUpdate(query, new CachedResult { JsonResult = JsonConvert.SerializeObject(all), Timestamp = DateTime.Now }, (_, existing) => new CachedResult { JsonResult = JsonConvert.SerializeObject(all), Timestamp = DateTime.Now });
+            cache.AddOrUpdate(query, new CachedResult { JsonResult = JsonConvert.SerializeObject(AllNews), Timestamp = DateTime.Now }, (_, existing) => new CachedResult { JsonResult = JsonConvert.SerializeObject(AllNews), Timestamp = DateTime.Now });
             isBusy = false;
 
-            return JsonConvert.SerializeObject(all);
+            return JsonConvert.SerializeObject(AllNews);
         }
     }
 
-    public class AllNews
+    public class News
     {
         public DateTime lasttime;
         public string Symbol;
-        public Dictionary<DateTime, string> cacheval;
+        public DateTime newsTime;
+        public string news;
+        public string sentiment;
+        public string provider;
     }
 
     public class CachedResult
