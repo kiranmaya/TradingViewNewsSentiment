@@ -14,10 +14,9 @@ using System.Threading.Tasks;
 
 Console.WriteLine("Started");
 
+NiftySymbols.StartSymbolLoop();
 
-//await RestTest.CallFlaskApiAsync("This is good ");
-
-await WebSearch.Search("HEROMOTOCO");
+ 
 
 await Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
@@ -32,8 +31,16 @@ await Host.CreateDefaultBuilder(args)
                         {
                             //http://localhost:2002/api/WebScraping/GetNews/AXISBANK
                             var symbol = context.Request.RouteValues["symbol"]?.ToString();
+
                             var result = await WebSearch.Search(symbol);
+
                             await context.Response.WriteAsync(result);
+                        }  );
+                        endpoints.MapGet("/api/WebScraping/GetRuntimeNews/{symbol}", async context =>
+                        {
+                            var symbol = context.Request.RouteValues["symbol"]?.ToString();
+                            var runtimeNews = await NiftySymbols.GetNews(symbol) ; // Replace with your actual logic
+                            await context.Response.WriteAsync(runtimeNews);
                         });
                     });
                 });

@@ -14,12 +14,14 @@ namespace WebScrapper
     {
         static ChromeDriver driver;
         static readonly ConcurrentDictionary<string, CachedResult> cache = new ConcurrentDictionary<string, CachedResult>();
-
+        static ConcurrentDictionary<string, string> cacheSentiment = new ConcurrentDictionary<string, string>();
         static bool isBusy = false;
+
+        static DateTime retreiveTime;
         public static async Task<string> Search(string query)
         {
-
-
+            retreiveTime = DateTime.Now;
+            Console.WriteLine($"Getting News for  {query}");
 
             // Check if result is cached and not expired
             if( cache.TryGetValue(query, out var cachedResult) && DateTime.Now.Subtract(cachedResult.Timestamp).TotalMinutes <= 3 )
@@ -95,7 +97,7 @@ namespace WebScrapper
                     var dateElement = article.FindElement(By.CssSelector(".date-TUPxzdRV relative-time"));
                     var ssrTime = dateElement.GetAttribute("event-time");
                     string dateString = ssrTime;
-                    DateTime newsTims = DateTime.ParseExact(dateString, "ddd, dd MMM yyyy HH:mm:ss 'GMT'", System.Globalization.CultureInfo.InvariantCulture);
+                    DateTime newsTims = DateTime.ParseExact(dateString, "ddd, dd MMM yyyy HH:mm:ss 'GMT'", System.Globalization.CultureInfo.InvariantCulture).ToLocalTime();
 
                     if( newsTims.AddDays(10) > DateTime.Now )
                     {
@@ -105,13 +107,24 @@ namespace WebScrapper
                         news1.news = title;
                         news1.Symbol = query;
                         news1.newsTime= newsTims;
+
+                        if( cacheSentiment.ContainsKey(news1.news) )
+                        {
+                            news1.sentiment = cacheSentiment[news1.news];
+                        }
+                        else
+                        {
+                            var res = await news1.FillSentiment();
+                            cacheSentiment.TryAdd(news1.news, res);
+                        }
+                      
                         AllNews.Add(news1);
                         Console.WriteLine($"Title: {title}");
                         Console.WriteLine(newsTims.ToString("dd-MM-yyy HH:mm:ss")); // Display in a specific format
                         Console.WriteLine();
 
 
-                 
+
                     }
                 }
                 catch( Exception e )
@@ -130,6 +143,8 @@ namespace WebScrapper
             cache.AddOrUpdate(query, new CachedResult { JsonResult = JsonConvert.SerializeObject(AllNews), Timestamp = DateTime.Now }, (_, existing) => new CachedResult { JsonResult = JsonConvert.SerializeObject(AllNews), Timestamp = DateTime.Now });
             isBusy = false;
 
+            Console.WriteLine("Took "+( DateTime.Now - retreiveTime ).TotalSeconds + "  Seconds");
+
             return JsonConvert.SerializeObject(AllNews);
         }
     }
@@ -142,6 +157,12 @@ namespace WebScrapper
         public string news;
         public string sentiment;
         public string provider;
+
+        public async Task<string> FillSentiment()
+        {
+            sentiment = await SentimentApi.CallFlaskApiAsync(news);
+            return sentiment;
+        }
     }
 
     public class CachedResult
