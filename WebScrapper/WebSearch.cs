@@ -83,17 +83,14 @@ namespace WebScrapper
             {
                 try
                 {
-
-
                     IWebElement element = article.FindElement(By.CssSelector("span[class*='block-'] span"));
-
 
                     string reutersValue = element.Text;
                     // Output the value
                     Console.WriteLine($"Provider Value: {reutersValue}");
 
                     var title = article.FindElement(By.CssSelector("[class^='title-']")).Text;
-                    title =  title;
+                    
                     var dateElement = article.FindElement(By.CssSelector(".date-TUPxzdRV relative-time"));
                     var ssrTime = dateElement.GetAttribute("event-time");
                     string dateString = ssrTime;
@@ -122,8 +119,6 @@ namespace WebScrapper
                         Console.WriteLine($"Title: {title}");
                         Console.WriteLine(newsTims.ToString("dd-MM-yyy HH:mm:ss")); // Display in a specific format
                         Console.WriteLine();
-
-
 
                     }
                 }
