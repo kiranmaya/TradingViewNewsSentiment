@@ -24,7 +24,7 @@ namespace WebScrapper
             Console.WriteLine($"Getting News for  {query}");
 
             // Check if result is cached and not expired
-            if( cache.TryGetValue(query, out var cachedResult) && DateTime.Now.Subtract(cachedResult.Timestamp).TotalMinutes <= 3 )
+            if( cache.TryGetValue(query, out var cachedResult) && DateTime.Now.Subtract(cachedResult.Timestamp).TotalMinutes <= 2 )
             {
                 Console.WriteLine($"Returning cached result for {query}");
                 isBusy = false;
@@ -135,7 +135,9 @@ namespace WebScrapper
      
 
             // Cache the result
+            if( AllNews.Count > 0 ) { 
             cache.AddOrUpdate(query, new CachedResult { JsonResult = JsonConvert.SerializeObject(AllNews), Timestamp = DateTime.Now }, (_, existing) => new CachedResult { JsonResult = JsonConvert.SerializeObject(AllNews), Timestamp = DateTime.Now });
+            }
             isBusy = false;
 
             Console.WriteLine("Took "+( DateTime.Now - retreiveTime ).TotalSeconds + "  Seconds");
