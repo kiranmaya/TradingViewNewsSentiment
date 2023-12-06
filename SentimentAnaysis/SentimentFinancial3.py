@@ -3,11 +3,23 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from flask import Flask, request, jsonify
 from urllib.parse import unquote
 from collections import deque
+from datetime import datetime
 
-# Load tokenizer and model
+print(f"Started {datetime.now().strftime('%H:%M:%S')}")
 model_name = "RashidNLP/Finance-Sentiment-Classification"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForSequenceClassification.from_pretrained(model_name)
+tokenizer = None
+
+model = None
+def load_model():
+    global tokenizer, model
+    if tokenizer is None or model is None:
+        print(f"Loading started for model {datetime.now().strftime('%H:%M:%S')}")
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        model = AutoModelForSequenceClassification.from_pretrained(model_name)
+        print(f"Loading Done ")
+
+load_model()
+print(f"Starting Flask Server {datetime.now().strftime('%H:%M:%S')} ")
 app = Flask(__name__)
 # Use a deque to store results with a maximum size of 2000 entries
 result_cache = deque(maxlen=2000)

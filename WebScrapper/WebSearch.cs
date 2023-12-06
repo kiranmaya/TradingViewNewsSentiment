@@ -79,15 +79,15 @@ namespace WebScrapper
 
            List<News> AllNews = new List<News>();
 
-            foreach( var article in articleElements.Take(5) ) // Assuming you want to process the first 5 articles
+            foreach( var article in articleElements.Take(9) ) // Assuming you want to process the first 5 articles
             {
                 try
                 {
                     IWebElement element = article.FindElement(By.CssSelector("span[class*='block-'] span"));
 
-                    string reutersValue = element.Text;
+                    string providerText = element.Text;
                     // Output the value
-                    Console.WriteLine($"Provider Value: {reutersValue}");
+                    Console.WriteLine($"Provider Value: {providerText}");
 
                     var title = article.FindElement(By.CssSelector("[class^='title-']")).Text;
                     
@@ -95,12 +95,12 @@ namespace WebScrapper
                     var ssrTime = dateElement.GetAttribute("event-time");
                     string dateString = ssrTime;
                     DateTime newsTims = DateTime.ParseExact(dateString, "ddd, dd MMM yyyy HH:mm:ss 'GMT'", System.Globalization.CultureInfo.InvariantCulture).ToLocalTime();
-
-                    if( newsTims.AddDays(10) > DateTime.Now )
+                    //<span>Dow Jones Newswires</span>
+                    if( newsTims.AddDays(10) > DateTime.Now && (providerText== "Reuters"  || providerText.Contains("Dow Jones Newswires") ) )
                     {
                         News news1 = new News();
                         news1.lasttime = DateTime.Now;
-                        news1.provider = reutersValue;
+                        news1.provider = providerText;
                         news1.news = title;
                         news1.Symbol = query;
                         news1.newsTime= newsTims;
@@ -116,6 +116,8 @@ namespace WebScrapper
                         }
                       
                         AllNews.Add(news1);
+
+
                         Console.WriteLine($"Title: {title}");
                         Console.WriteLine(newsTims.ToString("dd-MM-yyy HH:mm:ss")); // Display in a specific format
                         Console.WriteLine();

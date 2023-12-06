@@ -84,8 +84,14 @@ namespace WebScrapper
         public bool isDelisted { get; set; }
         public string isin { get; set; }
         public string industry { get; set; }
+        public Quotepreopenstatus quotepreopenstatus { get; set; }
     }
-
+    public class Quotepreopenstatus
+    {
+        public string equityTime { get; set; }
+        public string preOpenTime { get; set; }
+        public bool QuotePreOpenFlag { get; set; }
+    }
     public class Metadata
     {
         public string indexName { get; set; }
@@ -101,6 +107,6 @@ namespace WebScrapper
         public double yearLow { get; set; }
         public int totalTradedVolume { get; set; }
         public double totalTradedValue { get; set; }
-        public double ffmc_sum { get; set; }
+      
     }
 }

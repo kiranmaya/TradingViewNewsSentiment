@@ -17,7 +17,7 @@ namespace WebScrapper
         {
             LoadSymbols();
             // Set up the timer to call LoopSymbols every 2 minutes
-            symbolLoopTimer = new Timer(LoopSymbolsCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(300));
+            symbolLoopTimer = new Timer(LoopSymbolsCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
         }
 
         private static async void LoopSymbolsCallback(object state)
@@ -30,11 +30,14 @@ namespace WebScrapper
         public static ConcurrentDictionary<string, string> NewsData = new ConcurrentDictionary<string, string>();
         public static async Task<string> LoadSymbols()
         {
+            try { 
             if( nifty50 == null) { 
-            nifty50 = JsonConvert.DeserializeObject<IndexStocksNSE>(File.ReadAllText(@"C:\wamp64\www\zerodha\NIFTY50.json"));
+            nifty50 = JsonConvert.DeserializeObject<IndexStocksNSE>(File.ReadAllText(@"C:\wamp64\www\zerodha\NseFututes.json"));
             }
             Console.WriteLine($"Nifty50 {nifty50?.data?.Count}");
             Console.WriteLine();
+            }
+            catch( Exception e ) { Console.WriteLine(e.Message); }
             return "Done";
         }
 
