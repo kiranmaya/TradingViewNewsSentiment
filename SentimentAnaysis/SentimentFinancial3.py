@@ -22,7 +22,7 @@ load_model()
 print(f"Starting Flask Server {datetime.now().strftime('%H:%M:%S')} ")
 app = Flask(__name__)
 # Use a deque to store results with a maximum size of 2000 entries
-result_cache = deque(maxlen=2000)
+result_cache = deque(maxlen=4000)
 
 def analyze_sentiment(text):
     # Tokenize the input text
@@ -43,6 +43,7 @@ def analyze_sentiment(text):
 
 @app.route('/sentiment', methods=['POST'])
 def get_sentiment():
+    print(f"sentiment start {datetime.now().strftime('%H:%M:%S')}")
     data = request.get_json()
     text_to_analyze = data.get('text', '')
     decoded_text = unquote(text_to_analyze)
@@ -59,6 +60,10 @@ def get_sentiment():
     # Move print statements outside the else block
     print(decoded_text)
     print(result)
+    print(f"sentiment End {datetime.now().strftime('%H:%M:%S')}")
+    print("")
+    print("")
+    print("")
     return jsonify({'sentiment': result})
 
 if __name__ == '__main__':

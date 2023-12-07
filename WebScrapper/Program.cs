@@ -41,6 +41,10 @@ await Host.CreateDefaultBuilder(args)
                             var symbol = context.Request.RouteValues["symbol"]?.ToString();
                             var runtimeNews = await NiftySymbols.GetNews(symbol) ; // Replace with your actual logic
                             await context.Response.WriteAsync(runtimeNews);
+                            Console.Write(runtimeNews);
+                            Console.Write(""); Console.Write(""); Console.Write(""); Console.Write("");
+                            Console.Write(DateTime.Now.ToString("h:mm:ss tt"));
+                            Console.Write(""); Console.Write("");
                         });
                     });
                 });
