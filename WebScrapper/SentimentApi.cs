@@ -59,6 +59,7 @@ namespace WebScrapper
             {
                 // Print an error message
                 System.Diagnostics.Debug.WriteLine($"Exception Error: {e.Message}  ");
+               
                 Console.WriteLine($" Exception Error: {e.Message} ");
                 return "Error";
 

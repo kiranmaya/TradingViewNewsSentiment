@@ -17,14 +17,15 @@ namespace WebScrapper
         {
             LoadSymbols();
             // Set up the timer to call LoopSymbols every 2 minutes
-            symbolLoopTimer = new Timer(LoopSymbolsCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
+            symbolLoopTimer = new Timer(LoopSymbolsCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(2));
         }
 
         private static async void LoopSymbolsCallback(object state)
         {
             Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine();
             Console.WriteLine($"Call LoopSymbols function  {DateTime.Now.ToLongTimeString()}");
-            await   LoopSymbols();
+            var res=  await LoopSymbols();
+            Console.WriteLine($" LoopSymbols res => {res}");
         }
         static IndexStocksNSE nifty50;
         public static ConcurrentDictionary<string, string> NewsData = new ConcurrentDictionary<string, string>();
@@ -51,13 +52,14 @@ namespace WebScrapper
             {
                 try
                 {
-
                     if( NewsData.ContainsKey(item.symbol) == false )
                     {
                         NewsData.TryAdd(item.symbol, "");
                     }
+
                     var result = await WebSearch.Search(item.symbol);
                     NewsData[item.symbol] = result;
+                    await Task.Delay(1000);
                 }
                 catch( Exception e ) { Console.WriteLine(e.Message); }
             }

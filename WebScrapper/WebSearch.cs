@@ -15,7 +15,7 @@ namespace WebScrapper
         static ChromeDriver driver;
         static readonly ConcurrentDictionary<string, CachedResult> cache = new ConcurrentDictionary<string, CachedResult>();
         static ConcurrentDictionary<string, string> cacheSentiment = new ConcurrentDictionary<string, string>();
-        static bool isBusy = false;
+        public static bool isBusy = false;
 
         static DateTime retreiveTime;
         public static async Task<string> Search(string query)
@@ -68,16 +68,13 @@ namespace WebScrapper
             await Task.Delay(200);
             Console.WriteLine("waiting done ");
 
-     
-
             var articleElements = driver.FindElements(By.XPath("//article[contains(@class, 'card-exterior')]"));
 
             Console.WriteLine("articleElements   " + articleElements.Count);
 
             // Iterate through each article and extract title and date
-        
 
-           List<News> AllNews = new List<News>();
+            List<News> AllNews = new List<News>();
 
             foreach( var article in articleElements.Take(9) ) // Assuming you want to process the first 5 articles
             {
@@ -90,13 +87,12 @@ namespace WebScrapper
                     Console.WriteLine($"Provider Value: {providerText}");
 
                     var title = article.FindElement(By.CssSelector("[class^='title-']")).Text;
-                    
                     var dateElement = article.FindElement(By.CssSelector(".date-TUPxzdRV relative-time"));
                     var ssrTime = dateElement.GetAttribute("event-time");
                     string dateString = ssrTime;
                     DateTime newsTims = DateTime.ParseExact(dateString, "ddd, dd MMM yyyy HH:mm:ss 'GMT'", System.Globalization.CultureInfo.InvariantCulture).ToLocalTime();
                     //<span>Dow Jones Newswires</span>
-                    if( newsTims.AddDays(10) > DateTime.Now && (providerText== "Reuters"  || providerText.Contains("Dow Jones Newswires") ) )
+                    if( newsTims.AddDays(10) > DateTime.Now && (providerText== "Reuters"  || providerText.Contains("Dow Jones Newswires") ) ) // || providerText.Contains("MT Newswires")
                     {
                         News news1 = new News();
                         news1.lasttime = DateTime.Now;
@@ -116,7 +112,6 @@ namespace WebScrapper
                         }
                       
                         AllNews.Add(news1);
-
 
                         Console.WriteLine($"Title: {title}");
                         Console.WriteLine(newsTims.ToString("dd-MM-yyy HH:mm:ss")); // Display in a specific format
@@ -142,7 +137,7 @@ namespace WebScrapper
             }
             isBusy = false;
 
-            Console.WriteLine("Took "+( DateTime.Now - retreiveTime ).TotalSeconds + "  Seconds");
+            Console.WriteLine("Took "+( DateTime.Now - retreiveTime ).TotalSeconds + $"  Seconds , AllNews {AllNews.Count}");
 
             return JsonConvert.SerializeObject(AllNews);
         }
