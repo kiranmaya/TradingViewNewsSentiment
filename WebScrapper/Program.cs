@@ -16,8 +16,6 @@ Console.WriteLine("Started");
 
 NiftySymbols.StartSymbolLoop();
 
- 
-
 await Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
