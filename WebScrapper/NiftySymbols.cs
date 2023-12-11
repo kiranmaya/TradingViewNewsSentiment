@@ -15,17 +15,31 @@ namespace WebScrapper
 
         public static void StartSymbolLoop()
         {
+            lastReqTime = DateTime.Now;
+            StartTime= DateTime.Now;
             LoadSymbols();
             // Set up the timer to call LoopSymbols every 2 minutes
             symbolLoopTimer = new Timer(LoopSymbolsCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(2));
         }
-
+        public static DateTime lastReqTime;
+        public static DateTime StartTime;
         private static async void LoopSymbolsCallback(object state)
         {
             Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine(); Console.WriteLine();
             Console.WriteLine($"Call LoopSymbols function  {DateTime.Now.ToLongTimeString()}");
-            var res=  await LoopSymbols();
-            Console.WriteLine($" LoopSymbols res => {res}");
+
+            if( ( DateTime.Now - lastReqTime ).TotalMinutes > 60 )//minutes
+            {
+                Console.WriteLine($"No NEWS Request came in last  {( DateTime.Now - lastReqTime ).TotalMinutes}minutes ,So waiting for request ");
+            }
+            else
+            {
+                var res = await LoopSymbols();
+                Console.WriteLine($"{DateTime.Now} LoopSymbols res => {res}");
+            }
+
+            Console.WriteLine($" Runtime {(DateTime.Now-StartTime).TotalDays} days   ");
+
         }
         static IndexStocksNSE nifty50;
         public static ConcurrentDictionary<string, string> NewsData = new ConcurrentDictionary<string, string>();
@@ -72,7 +86,6 @@ namespace WebScrapper
         }
         public static async Task<string> GetNews(string query)
         {
-          
             await Task.Delay(20);
             if( NewsData.ContainsKey(query) == false )
             {

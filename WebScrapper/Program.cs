@@ -29,7 +29,7 @@ await Host.CreateDefaultBuilder(args)
                         {
                             //http://localhost:2002/api/WebScraping/GetNews/AXISBANK
                             var symbol = context.Request.RouteValues["symbol"]?.ToString();
-
+                            NiftySymbols.lastReqTime = DateTime.Now;
                             var result = await WebSearch.Search(symbol);
 
                             await context.Response.WriteAsync(result);
@@ -37,9 +37,11 @@ await Host.CreateDefaultBuilder(args)
                         endpoints.MapGet("/api/WebScraping/GetRuntimeNews/{symbol}", async context =>
                         {
                             var symbol = context.Request.RouteValues["symbol"]?.ToString();
+                            NiftySymbols.lastReqTime = DateTime.Now;
                             var runtimeNews = await NiftySymbols.GetNews(symbol) ; // Replace with your actual logic
                             await context.Response.WriteAsync(runtimeNews);
                             Console.Write(runtimeNews);
+
                             Console.Write(""); Console.Write(""); Console.Write(""); Console.Write("");
                             Console.Write(DateTime.Now.ToString("h:mm:ss tt"));
                             Console.Write(""); Console.Write("");
