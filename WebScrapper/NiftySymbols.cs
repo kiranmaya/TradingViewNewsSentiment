@@ -52,6 +52,10 @@ namespace WebScrapper
             {
                 try
                 {
+                    while( WebSearch.isBusy )
+                    {
+                        await Task.Delay(100); // Adjust the delay based on your needs
+                    }
                     if( NewsData.ContainsKey(item.symbol) == false )
                     {
                         NewsData.TryAdd(item.symbol, "");
