@@ -72,7 +72,7 @@ namespace WebScrapper
                     }
                     if( NewsData.ContainsKey(item.symbol) == false )
                     {
-                        NewsData.TryAdd(item.symbol, "");
+                        NewsData.TryAdd(item.symbol, "{}");
                     }
 
                     var result = await WebSearch.Search(item.symbol);
@@ -89,8 +89,9 @@ namespace WebScrapper
             await Task.Delay(20);
             if( NewsData.ContainsKey(query) == false )
             {
-                NewsData.TryAdd(query, "");
+                NewsData.TryAdd(query, "{}");
             }
+        
             return NewsData[query];
         }
     }
