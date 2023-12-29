@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 
 Console.WriteLine("Started");
-
+var result = await WebSearch.Search("ITC");
 NiftySymbols.StartSymbolLoop();
 
 await Host.CreateDefaultBuilder(args)
@@ -33,12 +33,12 @@ await Host.CreateDefaultBuilder(args)
                             var result = await WebSearch.Search(symbol);
 
                             await context.Response.WriteAsync(result);
-                        }  );
+                        });
                         endpoints.MapGet("/api/WebScraping/GetRuntimeNews/{symbol}", async context =>
                         {
                             var symbol = context.Request.RouteValues["symbol"]?.ToString();
                             NiftySymbols.lastReqTime = DateTime.Now;
-                            var runtimeNews = await NiftySymbols.GetNews(symbol) ; // Replace with your actual logic
+                            var runtimeNews = await NiftySymbols.GetNews(symbol); // Replace with your actual logic
                             await context.Response.WriteAsync(runtimeNews);
                             Console.Write(runtimeNews);
 

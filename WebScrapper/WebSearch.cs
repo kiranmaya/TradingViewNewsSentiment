@@ -80,43 +80,75 @@ namespace WebScrapper
             {
                 try
                 {
-                    IWebElement element = article.FindElement(By.CssSelector("span[class*='block-'] span"));
 
-                    string providerText = element.Text;
+                    string providerText = "";
                     // Output the value
-                    Console.WriteLine($"Provider Value: {providerText}");
 
-                    var title = article.FindElement(By.CssSelector("[class^='title-']")).Text;
-                    var dateElement = article.FindElement(By.CssSelector(".date-TUPxzdRV relative-time"));
-                    var ssrTime = dateElement.GetAttribute("event-time");
-                    string dateString = ssrTime;
-                    DateTime newsTims = DateTime.ParseExact(dateString, "ddd, dd MMM yyyy HH:mm:ss 'GMT'", System.Globalization.CultureInfo.InvariantCulture).ToLocalTime();
-                    //<span>Dow Jones Newswires</span>
-                    if( newsTims.AddDays(10) > DateTime.Now && (providerText== "Reuters"  || providerText.Contains("Dow Jones Newswires") ) ) // || providerText.Contains("MT Newswires")
+                    /*
+                        IWebElement titleElement = driver.FindElement(By.XPath("//div[@class='title-rY32JioV']"));
+            IWebElement eventTimeElement = driver.FindElement(By.XPath("//span[@class='date-TUPxzdRV']"));
+            IWebElement providerElement = driver.FindElement(By.XPath("//span[@class='provider-TUPxzdRV']"));
+                     
+                     */
+                    var title = article.FindElement(By.CssSelector("[class^='apply-overflow-']")).Text;
+                    Console.WriteLine($"title: {title}");
+                    var allDates = article.FindElements(By.CssSelector("[class^='apply-common-tooltip']"));
+
+                    Console.WriteLine($"allDates: {allDates.Count}");
+                    Console.WriteLine($"allDates: {allDates.First().Text}");
+                    Console.WriteLine($"allDates: {allDates.First().ToString()}");
+
+                    string dateString = "";
+                    if( allDates.Count < 1 ) continue;
+                    try
                     {
-                        News news1 = new News();
-                        news1.lasttime = DateTime.Now;
-                        news1.provider = providerText;
-                        news1.news = title;
-                        news1.Symbol = query;
-                        news1.newsTime= newsTims;
 
-                        if( cacheSentiment.ContainsKey(news1.news) )
+                        var ssrTime = allDates.First().GetAttribute("datetime");
+                        dateString = ssrTime;
+                    }
+                    catch
+                    {
+
+                        var ssrTime = allDates.First().GetAttribute("event-time");
+                        dateString = ssrTime;
+                    }
+
+
+                    if( dateString != null )
+                    {
+                        Console.WriteLine($"dateString: {dateString}");
+                        DateTime newsTims = DateTime.Parse(dateString).ToLocalTime();
+                        Console.WriteLine($"ToLocalTime newsTims: {newsTims}");
+
+                        var providerElement = article.FindElement(By.CssSelector("[class^='provider-']"));
+                        providerText = providerElement.Text;
+                        Console.WriteLine($"Provider Text: {providerText}");
+                        //<span>Dow Jones Newswires</span>
+                        if( newsTims.AddDays(10) > DateTime.Now && ( providerText == "Reuters" || providerText.Contains("Dow Jones Newswires") ) ) // || providerText.Contains("MT Newswires")
                         {
-                            news1.sentiment = cacheSentiment[news1.news];
-                        }
-                        else
-                        {
-                            var res = await news1.FillSentiment();
-                            cacheSentiment.TryAdd(news1.news, res);
-                        }
-                      
-                        AllNews.Add(news1);
+                            News news1 = new News();
+                            news1.lasttime = DateTime.Now;
+                            news1.provider = providerText;
+                            news1.news = title;
+                            news1.Symbol = query;
+                            news1.newsTime = newsTims;
 
-                        Console.WriteLine($"Title: {title}");
-                        Console.WriteLine(newsTims.ToString("dd-MM-yyy HH:mm:ss")); // Display in a specific format
-                        Console.WriteLine();
+                            if( cacheSentiment.ContainsKey(news1.news) )
+                            {
+                                news1.sentiment = cacheSentiment[news1.news];
+                            }
+                            else
+                            {
+                                var res = await news1.FillSentiment();
+                                cacheSentiment.TryAdd(news1.news, res);
+                            }
 
+                            AllNews.Add(news1);
+
+                            Console.WriteLine($"Title: {title}");
+                            Console.WriteLine(newsTims.ToString("dd-MM-yyy HH:mm:ss")); // Display in a specific format
+                            Console.WriteLine();
+                        }
                     }
                 }
                 catch( Exception e )
@@ -129,15 +161,16 @@ namespace WebScrapper
             }
 
             Console.WriteLine("Done ");
-     
+
 
             // Cache the result
-            if( AllNews.Count > 0 ) { 
-            cache.AddOrUpdate(query, new CachedResult { JsonResult = JsonConvert.SerializeObject(AllNews), Timestamp = DateTime.Now }, (_, existing) => new CachedResult { JsonResult = JsonConvert.SerializeObject(AllNews), Timestamp = DateTime.Now });
+            if( AllNews.Count > 0 )
+            {
+                cache.AddOrUpdate(query, new CachedResult { JsonResult = JsonConvert.SerializeObject(AllNews), Timestamp = DateTime.Now }, (_, existing) => new CachedResult { JsonResult = JsonConvert.SerializeObject(AllNews), Timestamp = DateTime.Now });
             }
             isBusy = false;
 
-            Console.WriteLine("Took "+( DateTime.Now - retreiveTime ).TotalSeconds + $"  Seconds , AllNews {AllNews.Count}");
+            Console.WriteLine("Took " + ( DateTime.Now - retreiveTime ).TotalSeconds + $"  Seconds , AllNews {AllNews.Count}");
 
             return JsonConvert.SerializeObject(AllNews);
         }
