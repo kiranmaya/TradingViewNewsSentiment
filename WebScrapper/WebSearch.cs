@@ -95,22 +95,22 @@ namespace WebScrapper
                     var allDates = article.FindElements(By.CssSelector("[class^='apply-common-tooltip']"));
 
                     Console.WriteLine($"allDates: {allDates.Count}");
-                    Console.WriteLine($"allDates: {allDates.First().Text}");
-                    Console.WriteLine($"allDates: {allDates.First().ToString()}");
+
 
                     string dateString = "";
                     if( allDates.Count < 1 ) continue;
-                    try
-                    {
 
-                        var ssrTime = allDates.First().GetAttribute("datetime");
-                        dateString = ssrTime;
-                    }
-                    catch
-                    {
 
-                        var ssrTime = allDates.First().GetAttribute("event-time");
+                    var ssrTime = allDates.First().GetAttribute("datetime");
+                    dateString = ssrTime;
+                    Console.WriteLine($"1st attempt {dateString}");
+
+                    if( dateString == null )
+                    {
+                        Console.WriteLine($"catchcatchcatchcatchcatch attempt");
+                        ssrTime = allDates.First().GetAttribute("event-time");
                         dateString = ssrTime;
+                        Console.WriteLine($"2nd attempt {dateString}");
                     }
 
 

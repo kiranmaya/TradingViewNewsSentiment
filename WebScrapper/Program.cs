@@ -13,7 +13,9 @@ using System.Threading.Tasks;
 
 
 Console.WriteLine("Started");
-var result = await WebSearch.Search("ITC");
+var result = await WebSearch.Search("HINDPETRO");
+
+
 NiftySymbols.StartSymbolLoop();
 
 await Host.CreateDefaultBuilder(args)
@@ -33,6 +35,7 @@ await Host.CreateDefaultBuilder(args)
                             var result = await WebSearch.Search(symbol);
 
                             await context.Response.WriteAsync(result);
+                            Console.Write(""); Console.Write(""); Console.Write(""); Console.Write("");
                         });
                         endpoints.MapGet("/api/WebScraping/GetRuntimeNews/{symbol}", async context =>
                         {
