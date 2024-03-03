@@ -13,10 +13,9 @@ using System.Threading.Tasks;
 
 
 Console.WriteLine("Started");
+/*
 var result = await WebSearch.Search("HINDPETRO");
-
-
-NiftySymbols.StartSymbolLoop();
+NiftySymbols.StartSymbolLoop();*/
 
 await Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
